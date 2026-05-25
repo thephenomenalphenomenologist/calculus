@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92W68TQK0P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-92W68TQK0P');
+</script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<link rel="stylesheet" href="ca-Style.css">
+<link rel="icon" href="images/favicon-32.png" sizes="32x32">
+<link rel="icon" href="images/favicon-128.png" sizes="128x128">
+<link rel="icon" href="images/favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="images/favicon-152.png" sizes="152x152">
+<link rel="apple-touch-icon" href="images/favicon-180.png" sizes="180x180">
+
+
+<script src="encrypt-X.js"></script>
+<script src="encode.js"></script>
+
+<script type='text/javascript'>
+
+	let pageURL = window.location.href;
+	let encodedURL = encodeURIComponent(pageURL);
+	var pageTitle = "Open Cloze Activity"
+    let text = "";
+    let words = [];
+    let groups = [];
+
+	function loadWebContent() {
+		rawText = decodeURI('E4qW Bw ISseR XEm uJZ f0H1 ChDfCd2Hp kq cQm lpRO 6oMXvc1 SythjK VF A 3dCwBZ2N, v5 RQV 8JHSu18ryx DKaG3Ptc; pwOYp9DnWUTR oL 1U qB9iI. XK NrROm ur 6mx9J kGx9 UtYE kd UFUx9eU, by wbZb pYAXScpm UDzxXFqJ EGbGQ 1oS5S LHC 0yCsim1Pp T8Bw0 THQ QyOlJ8bqS9 wC 0qSs o2 BK3ROV2XO.')	
+		rawText = rawText.replace(/%25/g,"%"); // replace UTF8 with %
+		rawText = rawText.replace(/%23/g,"#"); // replace UTF8 with hashtag
+		rawText = rawText.replace(/%26/g,"&"); // replace UTF8 with ampersand
+		rawText = rawText.replace(/%27/g,"'"); // replace UTF8 with single quote
+		rawText = rawText.replace(/%2B/g,"+"); // replace + with UTF8
+		text = decrypt(rawText);
+        prepContent();
+		}
+
+    function prepContent() {
+    
+    	if ("Cloze Activity" != "") { pageTitle = decode("Cloze Activity") }
+
+        docTitle = "Flippity.net: " + pageTitle
+        encodedDocTitle = encodeURIComponent(docTitle)    
+        text = text.split(" ");
+
+        let numsVis = false; // don't display numbers
+
+        for (var i=0; i<text.length; i++) {
+            //let dashed = text[i].replace(/[^!@#$%^&*();':",./?]/g, "_");
+            let length = text[i].length;
+            words[i] = {};
+            words[i].id = i;
+            words[i].word = text[i];
+            words[i].dashed = text[i].replace(/[^!@#$%^&*();':",./?¡¿]/g, "_");
+            words[i].length = text[i].length;
+            words[i].hidden = 1;
+            }
+
+        // Sort words alphabetically
+        words.sort(function(a, b) {
+            var textA = a.word.toUpperCase();
+            var textB = b.word.toUpperCase();
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+            });
+
+        // Sort by length in ascending order
+        words.sort((a, b) => a.length - b.length);
+
+        // Put words into 5 groups based on length
+        let g = 0;
+        let step = words.length/5;
+        for (var i=0; i<words.length; i++) {
+            groups[g] = [];
+            while (i < step*g) {
+                groups[g].push(words[i].id);
+                i++;
+                }
+            i--;
+            g++;
+            }
+
+        // Sort by id in ascending order (put back into correct order)
+        words.sort((a, b) => a.id - b.id);
+
+        let code = "";
+        for (var i=0; i<words.length; i++) {
+            let nm = 1 + i;
+            code += "<nobr><span class='num'>" + nm + "</span><div class='word' id='" + i + "' onclick='showHideWord(this)' title='Click to show/hide'>" + words[i].dashed + "</div></nobr> ";
+            }
+            
+        document.getElementById("text").innerHTML = code;
+        fillBank();
+        }
+        
+    function showHideWord(el) {
+        let id = el.id;
+        if (words[id].hidden) {
+            document.getElementById(id).innerHTML = words[id].word;
+            document.getElementById(id).style.animation = 'zoom 0.25s';
+            setTimeout( () => { document.getElementById(id).style.animation = 'none';},250);
+            }
+        else {
+            document.getElementById(id).innerHTML = words[id].dashed;
+            }
+        words[id].hidden = !words[id].hidden;
+        fillBank();
+        }
+
+    let boxes = document.getElementsByClassName("word");
+
+    g=0; // initial state
+    function showLess() {
+        if (g > 0) {
+            for (var i=0; i<groups[g].length; i++) {
+                let id = groups[g][i];
+                boxes[id].innerHTML = words[id].dashed;
+                words[id].hidden = 1;
+                }
+            g--;  
+            }
+        fillBank();
+        }
+
+    function showMore() {
+        if (g < 5) {
+            g++;
+            for (var i=0; i<groups[g].length; i++) {
+                let id = groups[g][i];
+                boxes[id].innerHTML = words[id].word;
+                words[id].hidden = 0;
+                }
+            }
+        fillBank();
+        }
+
+    function showAll() {
+        g=5;
+        for (var i=0; i<boxes.length; i++) {
+            boxes[i].innerHTML = words[i].word;
+            words[i].hidden = 0;
+            }
+        fillBank();
+        }
+
+    function hideAll() {
+        g=0;
+        let bank = [];
+        for (var i=0; i<boxes.length; i++) {
+            boxes[i].innerHTML = words[i].dashed;
+            words[i].hidden = 1;
+            bank.push(words[i].word.replace(/[!@#$%^&*();':",./?¡¿]/g,""));
+            }
+        fillBank();
+        }
+
+    function fillBank() {
+        let bank = [];
+        for (var i=0; i<boxes.length; i++) {
+            if (words[i].hidden == 1) {
+                bank.push("<div class='bankWord'>" + words[i].word.replace(/[!@#$%^&*();':",./?¡¿]/g,"") + "</div>");
+                }
+            }
+        // Sort words alphabetically
+        bank.sort(function(a, b) {
+            var textA = a.toUpperCase();
+            var textB = b.toUpperCase();
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+            });
+        if (bank.length > 0) {
+            document.getElementById("wordBank").innerHTML = bank.join("");
+            }
+        else {
+            document.getElementById("wordBank").innerHTML = "<div class='bankWord'>---</div>";
+            }
+        }
+
+    let showNums = false;
+    let nms = document.getElementsByClassName("num");
+    
+    function showHideNums() {
+        if (showNums) {
+            for (var i=0; i<nms.length; i++) {
+                nms[i].style.display = "none";
+                }
+            }
+        else {
+            for (var i=0; i<nms.length; i++) {
+                nms[i].style.display = "inline-block";
+                }
+            }
+        showNums = !showNums;
+        }
+
+    function hideNums() {
+            for (var i=0; i<nms.length; i++) {
+            nms[i].style.display = "none";
+            }
+        }
+
+    let gameMode = false;
+    function showHideGame() {
+        if (gameMode) {
+            document.getElementById("gameCol").style.display = "none";
+            }
+        else {
+            document.getElementById("gameCol").style.display = "table-cell";
+            document.getElementById("guess").value = "";
+            document.getElementById("guess").focus();
+            guessed = [];
+            document.getElementById("list").innerHTML = "";
+            hideAll();
+            }
+        gameMode = !gameMode;
+        }
+
+
+    let wordBankMode = false;
+    function showHideWordBank() {
+        if (wordBankMode) {
+            document.getElementById("wordBank").style.display = "none";
+            }
+        else {
+            document.getElementById("wordBank").style.display = "block";
+            }
+        wordBankMode = !wordBankMode;
+        }
+
+    let score = 0;
+    let guessed = [];
+    let correctNums = [];
+	var bell = new Audio("Bell.mp3");
+	var buzz = new Audio("Buzzer.mp3")
+    let wrd = "";
+    
+    function checkWord() {
+        //wrd = document.getElementById("guess").value.trim().replace(/[^a-zA-Z0-9]/g,"");
+        wrd = document.getElementById("guess").value.trim();
+        if (wrd != "") { // not empty
+            if (guessed.includes(wrd)) { // already guessed
+                document.getElementById("list").style.animation = "shake 0.25s";
+                setTimeout( () => { 
+                    document.getElementById("list").style.animation = "none";
+                    document.getElementById("guess").value = "";
+                    document.getElementById("guess").focus();
+                    },500);
+                }
+            else { // new word
+                guessed.push(wrd);
+                score = 0;
+                correctNums = [];
+                for (var i=0; i<words.length; i++) {
+                    //if (wrd.toUpperCase() == words[i].word.toUpperCase().replace(/[^a-zA-Z0-9]/g,"")) {
+                    if (wrd.toUpperCase() == words[i].word.toUpperCase().replace(/[!@#$%^&*();':",./?¡¿]/g,"")) {
+                        correctNums.push(i);
+                        words[i].hidden = 0;
+                        score++;
+                        }
+                    }
+                // Reveal correct words
+                let nm = 0;
+                if (score > 0) { // if there are words to reveal
+                    bell.play();
+                    boxes[correctNums[nm]].innerHTML = words[correctNums[nm]].word;
+                    boxes[correctNums[nm]].style.animation = 'zoom 0.25s';
+                    fillBank();
+                    nm++;
+                    if (correctNums.length > 1) { // there are still more words to reveal
+                        let interval = setInterval( () => {
+                            bell.pause();
+                            bell.currentTime = 0;
+                            bell.play();
+                            boxes[correctNums[nm]].innerHTML = words[correctNums[nm]].word;
+                            boxes[correctNums[nm]].style.animation = 'zoom 0.25s';
+                            nm++;
+                            if (nm == correctNums.length) {
+                                clearInterval(interval);
+                                setTimeout(endCheck,1000);
+                                }
+                            },1000);
+                        }
+                    else {
+                        setTimeout(endCheck,1000); // for if there is only one word to reveal
+                        }
+                    }
+                else { // no words to reveal
+                    buzz.play();
+                    endCheck();
+                    }
+                }
+            }
+        }
+
+    function endCheck() {
+        if (score > 0) {
+            clr = "#000";
+            }
+        else {
+            clr = "#f00";
+            }
+        let code = "<div class='guess' style='color: " + clr + ";'>" + wrd + " (" + score + ")</div>"
+        code += document.getElementById("list").innerHTML;
+        document.getElementById("list").innerHTML = code;
+        document.getElementById("guess").value = "";
+        document.getElementById("guess").focus();
+        }
+
+</script>
+
+</head>
+
+<body>
+
+<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+	<tr id="instructions" style="display: none;"><td align="center"><a href="OpenCloze.htm" target="_blank">Want to Make Your Own Open Cloze Activity?</a></td></tr>
+	<tr height="1" class="noPrint">
+		<td bgcolor="#ddd">
+        <div style="width: 728px; margin: 0px auto;">  
+            <div class="logo"><a href="https://www.flippity.net/"><img src="images/Flippity-Logo-Green.png" alt="Flippity.net" width="100" height="43" border="0" align="left"></a></div>
+            <h1 id="title" class="title">Open Cloze</h1>
+         </div>
+        </td>
+	</tr>
+  <tr height="1" class="print">
+    <td><img src="images/Flippitynet-Small-Gray.png" width="80" height="21" align="right" /><p id="printTitle" class="printTitle">Open Cloze</p></td>
+  </tr>
+  <tr>
+    <td valign="top" id="main">
+
+	<!--<br />
+<b>Warning</b>:  include(message.htm): failed to open stream: No such file or directory in <b>/home/ii0fxor38c6m/public_html/v2/ca.php</b> on line <b>351</b><br />
+<br />
+<b>Warning</b>:  include(): Failed opening 'message.htm' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in <b>/home/ii0fxor38c6m/public_html/v2/ca.php</b> on line <b>351</b><br />
+-->
+
+    <div id="loadingScreen" style="width: 100px; margin: 200px auto; display: none;">
+    <img src="images/Loading-Indicator-Lg-Gray.gif" alt="loading">
+    </div>
+        
+    <div id="mainScreen" style="margin: 20px;">
+    <table border="0" height="100%" width="100%">
+    <tr valign="top"><td align="center">
+    <div id="menu" class="noPrint">
+    <img src="images/Button-Numbers-Green.png" class="button" onclick="showHideNums()" title="Show/hide numbers" style="margin-right: 75px;">    
+    <img src="images/Button-Hide-Green.png" class="button" onclick="hideAll()" title="Hide all"> 
+    <img src="images/Button-Less-Green.png" class="button" onclick="showLess()" title="Show less"> 
+    <img src="images/Button-More-Green.png" class="button" onclick="showMore()" title="Show more"> 
+    <img src="images/Button-Show-Green.png" class="button" onclick="showAll()" title="Show all">
+    <img src="images/Button-Word-Bank.png" class="button" onclick="showHideWordBank()" title="Show/hide word bank" style="margin-left: 75px;">
+    <img src="images/Button-Game-mode.png" class="button" onclick="showHideGame()" title="Show/hide game">
+    </div>
+    <div id="wordBank" style="display: none;"></div>
+    <div id="text"></div>
+    </td>
+    <td id="gameCol" style="display: none; width: 300px; border-left: 1px solid #ddd; padding-left: 20px;">
+        <table width="100%" height="100%">
+        <tr height="60">
+        <td valign="top"><input type="text" id="guess"><img src="images/Button-Check-Small-Green.png" style="cursor: pointer; margin-left: 10px;" onclick="checkWord()" title="Check word"></td>
+        </tr>
+        <tr valign="top">
+        <td><div id="list"></div></td>
+        </tr>
+        </table>
+    </td>
+    </tr>
+    </table>
+    </div>
+</td></tr>
+
+  <tr class="noPrint">
+    <td height="1" align="center" valign="middle">
+		<script type="text/javascript">
+		function showHideShare() {
+            if (document.getElementById('share').style.display == 'none') {
+                document.getElementById('share').style.display = 'inline'
+                }
+            else {
+                document.getElementById('share').style.display = 'none'
+                }
+            }
+        </script>
+
+        <br>
+      <p class="share"><a class="share" href="javascript:showHideShare()" title="Show/Hide Sharing Options"><img src="images/Share-Icon-Gray.png" width="15" height="16" border="0" align="absmiddle"></a></p>
+
+	<div id="share" style="display: none;">
+    
+    <img src="images/Link-Icon.png" width="16" height="16" align="absmiddle" hspace="10">
+     <input id="linkURL" type="text" class="linkBox" onClick="this.select()" value="">
+
+    <table align="center" class="shareOptions">
+        <tr>
+            <td>
+				<script src="https://apis.google.com/js/platform.js" async defer></script>
+                <g:sharetoclassroom url="https://www.flippity.net/sa.asp?<%=queryVars%>" size="20"></g:sharetoclassroom>
+            </td>
+            <td id="email"></td>
+            <td id="QR"></td>
+        </tr>
+    </table>
+
+</div>
+
+  <tr class="noPrint">
+    <td height="1" align="center" valign="middle" bgcolor="#ddd">
+      <p class="copyright">&copy; 2025 Flippity.net. All Rights Reserved.</p>
+    </td>
+  </tr>
+ </table>
+
+<script type="text/javascript">
+
+    loadWebContent()
+
+    document.getElementById('linkURL').value = pageURL;
+    document.title = docTitle;
+    document.getElementById('title').innerHTML = pageTitle;
+
+    //email link
+    document.getElementById("email").innerHTML = "<a href='mailto:?subject=" + encodedDocTitle + "&body=" + encodedDocTitle + ": " + encodedURL + "' TARGET='_blank'><img src='images/Icon-Email.png' width='22' height='20' border='0' title='Email'></a>"
+
+    //QR code link
+    encodedQRurl = "QR.php?u=" + encodedURL + "&p=" + encodeURIComponent(pageTitle)
+    document.getElementById("QR").innerHTML = "<a href='" + encodedQRurl + "' target='_blank'><img src='images/Icon-QR-Code.png' width='20' height='20' border='0' title='Get QR Code'></a>"
+
+    if ("" == "y") { document.getElementById('instructions').style.display = "table-row" }
+
+    document.getElementById("guess")
+        .addEventListener("keyup", function(event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                checkWord();
+                }
+            });
+
+</script>
+
+</body>
+</html>
